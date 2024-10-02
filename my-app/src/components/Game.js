@@ -1,63 +1,40 @@
-import React, { useState } from 'react';
-// import PropTypes from 'prop-types';
+import React, { useEffect, useState } from 'react';
 import Field from './Field';
 import Information from './Information';
+import store from '../store/store';
 
-const WIN_PATTERNS = [
-	[0, 1, 2],
-	[3, 4, 5],
-	[6, 7, 8],
-	[0, 3, 6],
-	[1, 4, 7],
-	[2, 5, 8],
-	[0, 4, 8],
-	[2, 4, 6],
-];
-
+// Переключение игрока
 const Game = () => {
-	const [currentPlayer, setCurrentPlayer] = useState('X');
-	const [isGameEnded, setIsGameEnded] = useState(false);
-	const [isDraw, setIsDraw] = useState(false);
-	const [field, setField] = useState(['', '', '', '', '', '', '', '', '']);
+	const [state, setState] = useState(store.getState());
+
+	useEffect(() => {
+		const unsubscribe = store.subscribe(() => {
+			setState(store.getState());
+		});
+
+		return () => unsubscribe();
+	}, []);
 
 	const handleCellClick = (index) => {
-		if (isGameEnded || field[index] !== '') return;
-
-		const newField = [...field];
-		newField[index] = currentPlayer;
-
-		setField(newField);
-
-		if (checkWin(newField, currentPlayer)) {
-			setIsGameEnded(true);
-		} else if (!newField.includes('')) {
-			setIsDraw(true);
-		} else {
-			setCurrentPlayer(currentPlayer === 'X' ? '0' : 'X');
-		}
-	};
-
-	const checkWin = (field, player) => {
-		return WIN_PATTERNS.some((pattern) => {
-			return pattern.every((index) => field[index] === player);
-		});
+		if (state.isGameEnded || state.field[index] !== '') return;
+		store.dispatch({ type: 'MAKE_MOVE', payload: { index } });
 	};
 
 	const handleRestart = () => {
-		setIsGameEnded(false);
-		setIsDraw(false);
-		setCurrentPlayer('X');
-		setField(['', '', '', '', '', '', '', '', '']);
+		store.dispatch({ type: 'RESTART_GAME' });
 	};
 
 	return (
 		<div>
 			<Information
-				currentPlayer={currentPlayer}
-				isGameEnded={isGameEnded}
-				isDraw={isDraw}
+				currentPlayer={state.currentPlayer}
+				isGameEnded={state.isGameEnded}
+				isDraw={state.isDraw}
+				winner={
+					state.isGameEnded ? (state.currentPlayer === 'X' ? 'O' : 'X') : ''
+				}
 			/>
-			<Field field={field} onCellClick={handleCellClick} />
+			<Field field={state.field} onCellClick={handleCellClick} />
 			<button onClick={handleRestart}>Начать заново</button>
 		</div>
 	);
