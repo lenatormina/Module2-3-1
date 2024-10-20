@@ -17,30 +17,31 @@ const checkWin = (field, player) => {
 	});
 };
 
-const reducer = (state = {}, action) => {
+const initialState = {
+	currentPlayer: 'X',
+	isGameEnded: false,
+	isDraw: false,
+	field: ['', '', '', '', '', '', '', '', ''],
+};
+
+const reducer = (state = initialState, action) => {
 	switch (action.type) {
 		case CELL_CLICK:
 			const newField = [...state.field];
 			newField[action.index] = state.currentPlayer;
 
-			if (checkWin(newField, state.currentPlayer)) {
-				return { ...state, isGameEnded: true };
-			} else if (!newField.includes('')) {
-				return { ...state, isDraw: true };
-			} else {
-				return {
-					...state,
-					field: newField,
-					currentPlayer: state.currentPlayer === 'X' ? '0' : 'X',
-				};
-			}
-		case HANDLE_RESTART:
+			const isWin = checkWin(newField, state.currentPlayer);
 			return {
-				currentPlayer: 'X',
-				isGameEnded: false,
-				isDraw: false,
-				field: ['', '', '', '', '', '', '', '', ''],
+				...state,
+				field: newField,
+				currentPlayer: state.currentPlayer === 'X' ? 'O' : 'X',
+				isGameEnded: isWin,
+				isDraw: !isWin && !newField.includes(''),
 			};
+
+		case HANDLE_RESTART:
+			return initialState;
+
 		default:
 			return state;
 	}

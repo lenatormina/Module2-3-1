@@ -1,27 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import Field from './Field';
 import Information from './Information';
-import store from '../store/store';
+import { cellClick, handleRestart } from '../store/actions';
 
-// Переключение игрока
 const Game = () => {
-	const [state, setState] = useState(store.getState());
-
-	useEffect(() => {
-		const unsubscribe = store.subscribe(() => {
-			setState(store.getState());
-		});
-
-		return () => unsubscribe();
-	}, []);
+	const state = useSelector((state) => state);
+	const dispatch = useDispatch();
 
 	const handleCellClick = (index) => {
 		if (state.isGameEnded || state.field[index] !== '') return;
-		store.dispatch({ type: 'MAKE_MOVE', payload: { index } });
+		dispatch(cellClick(index));
 	};
 
-	const handleRestart = () => {
-		store.dispatch({ type: 'RESTART_GAME' });
+	const restartGame = () => {
+		dispatch(handleRestart());
 	};
 
 	return (
@@ -35,7 +28,8 @@ const Game = () => {
 				}
 			/>
 			<Field field={state.field} onCellClick={handleCellClick} />
-			<button onClick={handleRestart}>Начать заново</button>
+
+			<button onClick={restartGame}>Начать заново</button>
 		</div>
 	);
 };
