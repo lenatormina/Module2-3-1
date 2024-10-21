@@ -1,17 +1,21 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-const Information = ({ currentPlayer, isGameEnded, isDraw, winner }) => {
-	if (isDraw) {
-		return <div>Ничья</div>;
-	}
+class Information extends Component {
+	render() {
+		const { currentPlayer, isGameEnded, isDraw, winner } = this.props;
 
-	if (isGameEnded) {
-		return <div>Победа: {winner}</div>;
-	}
+		if (isDraw) {
+			return <div className="text-lg font-bold">Ничья</div>;
+		}
 
-	return <div>Ходит: {currentPlayer}</div>;
-};
+		if (isGameEnded) {
+			return <div className="text-lg font-bold">Победа: {winner}</div>;
+		}
+
+		return <div className="text-lg font-bold">Ходит: {currentPlayer}</div>;
+	}
+}
 
 Information.propTypes = {
 	currentPlayer: PropTypes.string.isRequired,

@@ -1,37 +1,53 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Field from './Field';
 import Information from './Information';
 import { cellClick, handleRestart } from '../store/actions';
 
-const Game = () => {
-	const state = useSelector((state) => state);
-	const dispatch = useDispatch();
-
-	const handleCellClick = (index) => {
-		if (state.isGameEnded || state.field[index] !== '') return;
-		dispatch(cellClick(index));
+class Game extends Component {
+	handleCellClick = (index) => {
+		if (this.props.isGameEnded || this.props.field[index] !== '') return;
+		this.props.cellClick(index);
 	};
 
-	const restartGame = () => {
-		dispatch(handleRestart());
+	restartGame = () => {
+		this.props.handleRestart();
 	};
 
-	return (
-		<div>
-			<Information
-				currentPlayer={state.currentPlayer}
-				isGameEnded={state.isGameEnded}
-				isDraw={state.isDraw}
-				winner={
-					state.isGameEnded ? (state.currentPlayer === 'X' ? 'O' : 'X') : ''
-				}
-			/>
-			<Field field={state.field} onCellClick={handleCellClick} />
+	render() {
+		const { currentPlayer, isGameEnded, isDraw, field } = this.props;
+		const winner = isGameEnded ? (currentPlayer === 'X' ? 'O' : 'X') : '';
 
-			<button onClick={restartGame}>Начать заново</button>
-		</div>
-	);
+		return (
+			<div className="p-4">
+				<Information
+					currentPlayer={currentPlayer}
+					isGameEnded={isGameEnded}
+					isDraw={isDraw}
+					winner={winner}
+				/>
+				<Field field={field} onCellClick={this.handleCellClick} />
+				<button
+					onClick={this.restartGame}
+					className="mt-4 p-2 bg-blue-500 text-white rounded"
+				>
+					Начать заново{' '}
+				</button>
+			</div>
+		);
+	}
+}
+
+const mapStateToProps = (state) => ({
+	currentPlayer: state.currentPlayer,
+	isGameEnded: state.isGameEnded,
+	isDraw: state.isDraw,
+	field: state.field,
+});
+
+const mapDispatchToProps = {
+	cellClick,
+	handleRestart,
 };
 
-export default Game;
+export default connect(mapStateToProps, mapDispatchToProps)(Game);

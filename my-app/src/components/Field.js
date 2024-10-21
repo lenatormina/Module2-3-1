@@ -1,18 +1,24 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import './Field.css';
 
-const Field = ({ field, onCellClick }) => {
-	return (
-		<div className="field">
-			{field.map((cell, index) => (
-				<div key={index} className="cell" onClick={() => onCellClick(index)}>
-					{cell}
-				</div>
-			))}
-		</div>
-	);
-};
+class Field extends Component {
+	render() {
+		const { field, onCellClick } = this.props;
+		return (
+			<div className="grid grid-cols-3 gap-0">
+				{field.map((cell, index) => (
+					<div
+						key={index}
+						className="w-14 h-14 border border-gray-300 cursor-pointer"
+						onClick={() => onCellClick(index)}
+					>
+						{cell}
+					</div>
+				))}
+			</div>
+		);
+	}
+}
 
 Field.propTypes = {
 	field: PropTypes.arrayOf(PropTypes.string).isRequired,
